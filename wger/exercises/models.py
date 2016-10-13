@@ -24,6 +24,7 @@ from django.db import models
 from django.template.loader import render_to_string
 from django.template.defaultfilters import slugify  # django.utils.text.slugify in django 1.5!
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils import translation
@@ -34,6 +35,7 @@ from django.core.validators import MinLengthValidator
 from django.conf import settings
 
 from wger.core.models import Language
+from wger.utils.helpers import smart_capitalize
 from wger.utils.managers import SubmissionManager
 from wger.utils.models import AbstractLicenseModel, AbstractSubmissionModel
 from wger.utils.cache import (
@@ -170,6 +172,12 @@ class Exercise(AbstractSubmissionModel, AbstractLicenseModel, models.Model):
 
     name = models.CharField(max_length=200,
                             verbose_name=_('Name'))
+    '''The exercise's name, with correct upercase'''
+
+    name_original = models.CharField(max_length=200,
+                                     verbose_name=_('Name'),
+                                     default='')
+    '''The exercise's name, as entered by the user'''
 
     muscles = models.ManyToManyField(Muscle,
                                      blank=True,
@@ -221,7 +229,7 @@ class Exercise(AbstractSubmissionModel, AbstractLicenseModel, models.Model):
         '''
         Reset all cached infos
         '''
-
+        self.name = smart_capitalize(self.name_original)
         super(Exercise, self).save(*args, **kwargs)
 
         # Cached objects
@@ -304,9 +312,10 @@ class Exercise(AbstractSubmissionModel, AbstractLicenseModel, models.Model):
             subject = _('Exercise was successfully added to the general database')
             context = {
                 'exercise': self.name,
-                'url': url
+                'url': url,
+                'site': Site.objects.get_current().domain
             }
-            message = render_to_string('exercise/email_new.html', context)
+            message = render_to_string('exercise/email_new.tpl', context)
             mail.send_mail(subject,
                            message,
                            settings.WGER_SETTINGS['EMAIL_FROM'],
@@ -439,7 +448,7 @@ class ExerciseImage(AbstractSubmissionModel, AbstractLicenseModel, models.Model)
         if request.user.has_perm('exercises.add_exerciseimage'):
             self.status = self.STATUS_ACCEPTED
             if not self.license_author:
-                self.license_author = 'wger.de'
+                self.license_author = request.get_host().split(':')[0]
 
         else:
             if not self.license_author:

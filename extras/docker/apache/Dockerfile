@@ -22,18 +22,17 @@ RUN a2ensite wger
 
 # Set up the application
 USER wger
-RUN git clone https://github.com/rolandgeider/wger.git /home/wger/src
-RUN virtualenv --python python3 /home/wger/venv
+RUN git clone https://github.com/wger-project/wger.git /home/wger/src
 
 WORKDIR /home/wger/src
-RUN npm install bower \
-    && . /home/wger/venv/bin/activate \
+RUN virtualenv --python python3 /home/wger/venv
+RUN . /home/wger/venv/bin/activate \
     && pip install --upgrade pip \
     && pip install -r requirements.txt \
-    && invoke --root wger create_settings \
+    && invoke create_settings \
         --settings-path /home/wger/src/settings.py \
         --database-path /home/wger/db/database.sqlite \
-    && invoke --root wger bootstrap_wger \
+    && invoke bootstrap_wger \
         --settings-path /home/wger/src/settings.py \
         --no-start-server
 
@@ -46,8 +45,8 @@ RUN chmod o+w -R ~/db/ \
     && mkdir ~/media \
     && chmod o+w ~/media \
     && sed -i "/^MEDIA_ROOT/c\MEDIA_ROOT='\/home\/wger\/media'" settings.py \
+    && python manage.py download-exercise-images \
     && echo STATIC_ROOT=\'/home/wger/static\' >> settings.py \
-    && mkdir /home/wger/src/components \
     && python manage.py collectstatic --noinput
 
 USER root

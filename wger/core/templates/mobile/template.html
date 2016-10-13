@@ -40,8 +40,10 @@
 
     <!-- twitter cards -->
     {% block twittercard %}
+    {% if twitter %}
         <meta content="summary" name="twitter:card">
-        <meta content="@wger_de" name="twitter:site">
+        <meta content="@{{ twitter }}" name="twitter:site">
+    {% endif %}
     {% endblock %}
 
     <title>{% block title %}{% endblock %}</title>
@@ -55,17 +57,19 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/workout-manager-common.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/workout-manager-mobile.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'bower_components/shariff/build/shariff.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'bower_components/metrics-graphics/dist/metricsgraphics.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/metricsgraphics-custom.css' %}">
     {% endcompress %}
 
     {% compress js %}
     <script src="{% static 'bower_components/jquery/dist/jquery.js' %}"></script>
-    <script src="{% static 'js/jquery-ui.js' %}"></script>
     <script src="{% static 'bower_components/bootstrap/dist/js/bootstrap.min.js' %}"></script>
     <script src="{% static 'bower_components/d3/d3.js' %}"></script>
-    <script src="{% static 'js/workout-manager.js' %}"></script>
-    <script src="{% static 'js/workout-manager-mobile.js' %}"></script>
+    <script src="{% static 'bower_components/metrics-graphics/dist/metricsgraphics.min.js' %}"></script>
+    <script src="{% static 'bower_components/devbridge-autocomplete/dist/jquery.autocomplete.min.js' %}"></script>
+    <script src="{% static 'js/wger-core.js' %}"></script>
+    <script src="{% static 'js/wger-core-mobile.js' %}"></script>
     <script src="{% static 'js/exercises.js' %}"></script>
-    <script src="{% static 'js/weight.js' %}"></script>
     <script src="{% static 'js/nutrition.js' %}"></script>
     {% endcompress %}
 
@@ -77,16 +81,16 @@
             $('.row-offcanvas').toggleClass('active')
         });
 
-        if (typeof custom_page_init != "undefined")
+        if (typeof wgerCustomPageInit != "undefined")
         {
-            custom_page_init();
+            wgerCustomPageInit();
         }
 
         // Init the modal dialog for editing forms
-        form_modal_dialog();
+        wgerFormModalDialog();
 
         // Check for RO-access before allowing sharing
-        toggle_ro_access();
+        wgerToggleReadOnlyAccess();
     });
     </script>
 
@@ -125,6 +129,9 @@
                             {% language_select language %}
                         {% endfor %}
                     </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Close" %}</button>
                 </div>
             </div>
         </div>

@@ -15,15 +15,14 @@
  <script>
 $(function() {
     // Init the autocompleter
-    $("#exercise-search").catcomplete({
-            source: "{% url 'exercise-search' %}",
-            minLength: 2,
-            select: function(event, ui) {
-
-                // Redirect to exercise after clicking on a result
-                // Path is hard coded here, because we can't use the url-tag
-                window.location.href = '/exercise/' + ui.item.id + '/view/'
-            }
+    $('#exercise-search').autocomplete({
+        showNoSuggestionNotice: true,
+        serviceUrl: '{% url 'exercise-search' %}',
+        onSelect: function (suggestion) {
+            window.location.href = '/exercise/' + suggestion.data.id + '/view/'
+        },
+        groupBy: 'category',
+        paramName: 'term'
     });
 });
 </script>
@@ -97,33 +96,27 @@ $(function() {
         Side bar
 -->
 {% block sidebar %}
-<p>
-    {% if user.is_authenticated and not user.userprofile.is_temporary %}
-    <a href="{% url 'exercise:exercise:add' %}" class="btn btn-success btn-sm">
-        {% trans "Add new exercise" %}
-    </a>
-    {% else %}
-    <a href="#" class="btn btn-success btn-sm disabled">
-        {% trans "Add new exercise" %}<br>
-        <small>
-        {% trans "Only registered users can do this" %}
-        </small>
-    </a>
-    {% endif %}
-</p>
-
-
-
 <h4>{% trans "Search" %}</h4>
-<form action="{% url 'exercise-search' %}"
-      method="get"
-      id="exercise_search_form">
-    {% csrf_token %}
     <input name="term"
            type="search"
            id="exercise-search"
            class="ajax-form-element form-control"
            placeholder="{% trans 'exercise name' %}"
            style="width:100%;">
-</form>
+{% endblock %}
+
+
+{% block options %}
+    {% if user.is_authenticated and not user.userprofile.is_temporary %}
+        <a href="{% url 'exercise:exercise:add' %}" class="btn btn-success btn-sm">
+            {% trans "Add new exercise" %}
+        </a>
+    {% else %}
+        <a href="#" class="btn btn-success btn-sm disabled">
+            {% trans "Add new exercise" %}<br>
+            <small>
+            {% trans "Only registered users can do this" %}
+            </small>
+        </a>
+    {% endif %}
 {% endblock %}

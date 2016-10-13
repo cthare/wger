@@ -19,7 +19,7 @@ Simple script that filters the output of django's dumpdata command into more
 manageable chunks.
 
 Create the data.json e.g. with:
-    python ../../manage.py dumpdata --indent 4 --natural > data.json
+    python ../../manage.py dumpdata --indent 4 --natural-foreign > data.json
 '''
 
 import json
@@ -71,6 +71,7 @@ filter_dump(data, ('gym.contract',), 'gym_contracts.json')
 filter_dump(data, ('core.gym',), 'gyms.json')
 filter_dump(data, ('core.language',), 'languages.json')
 filter_dump(data, ('core.license',), 'licenses.json')
+filter_dump(data, ('core.repetitionunit',), 'repetition_units.json')
 
 #
 # Configurations

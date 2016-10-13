@@ -10,7 +10,7 @@
     <li class="list-group-item ">
         <div class="btn-group pull-right">
             <button type="button" class="btn btn-default dropdown-toggle btn-xs" data-toggle="dropdown">
-                <span class="glyphicon glyphicon-cog"></span>
+                <span class="{% fa_class 'cog' %}"></span>
             </button>
             <ul class="dropdown-menu" role="menu">
                 <li>
@@ -33,16 +33,13 @@
 
 
 
-
-{% block sidebar %}
+{#         #}
+{# Options #}
+{#         #}
+{% block options %}
 {% if perms.core.add_license %}
-<p>
     <a href="{% url 'core:license:add' %}" class="btn btn-success btn-sm wger-modal-dialog">
         {% trans "Add" %}
     </a>
-</p>
-
-<p>{% blocktrans %}If a license has been localized, e.g. the Creative Commons
-licenses for the different countries, add them as separate entries here.{% endblocktrans %}</p>
 {% endif %}
 {% endblock %}

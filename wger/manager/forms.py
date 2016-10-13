@@ -18,20 +18,29 @@
 This file contains forms used in the application
 '''
 
+from captcha.fields import ReCaptchaField
+
+from django.utils.translation import ugettext as _
 from django.forms import (
     Form,
     MultipleHiddenInput,
     ModelForm,
     DateField,
+    IntegerField,
+    DecimalField,
     CharField,
     widgets,
     ModelChoiceField
 )
-from django.utils.translation import ugettext as _
 
-from captcha.fields import ReCaptchaField
-
-from wger.exercises.models import Exercise, ExerciseCategory
+from wger.core.models import (
+    RepetitionUnit,
+    WeightUnit
+)
+from wger.exercises.models import (
+    Exercise,
+    ExerciseCategory
+)
 from wger.manager.models import (
     WorkoutSession,
     Workout,
@@ -130,7 +139,23 @@ class HelperDateForm(Form):
 class WorkoutLogForm(ModelForm):
     '''
     Helper form for a WorkoutLog.
+
+    These fields are re-defined here only to make them optional
     '''
+    repetition_unit = ModelChoiceField(queryset=RepetitionUnit.objects.all(),
+                                       label=_('Unit'),
+                                       required=False)
+    weight_unit = ModelChoiceField(queryset=WeightUnit.objects.all(),
+                                   label=_('Unit'),
+                                   required=False)
+    exercise = ModelChoiceField(queryset=Exercise.objects.all(),
+                                label=_('Exercise'),
+                                required=False)
+    reps = IntegerField(label=_('Repetitions'),
+                        required=False)
+    weight = DecimalField(label=_('Weight'),
+                          initial=0,
+                          required=False)
 
     class Meta:
         model = WorkoutLog

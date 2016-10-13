@@ -2,8 +2,7 @@
 # Requirements for wger for production
 #
 
-Django>=1.8,<1.9
-django-browserid>=1.0,<1.1
+Django>=1.9,<1.10
 django-recaptcha
 reportlab
 django_mobile
@@ -16,9 +15,10 @@ django_compressor
 icalendar
 django-bootstrap-breadcrumbs
 sphinx
-django-sortedm2m 
+django-sortedm2m
 django-bower
 invoke
+requests
 
 # REST API
 djangorestframework>=3.2,<3.3

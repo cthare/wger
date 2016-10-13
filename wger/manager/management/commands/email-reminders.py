@@ -35,7 +35,7 @@ class Command(BaseCommand):
 
     help = 'Send out automatic email reminders for workouts'
 
-    def handle(self, *args, **options):
+    def handle(self, **options):
         '''
         Find if the currently active workout is overdue
         '''
@@ -78,9 +78,7 @@ class Command(BaseCommand):
                 schedule_step = schedule.get_current_scheduled_workout()
 
                 # Only notify if the step is the last one in the schedule
-                # TODO: this could be simplified using last(), introduced in django 1.6
-                step_list = [step for step in schedule.schedulestep_set.all()]
-                if schedule_step == step_list[-1]:
+                if schedule_step == schedule.schedulestep_set.last():
 
                     delta = schedule.get_end_date() - datetime.date.today()
                     if datetime.timedelta(days=profile.workout_reminder) > delta:
@@ -112,11 +110,10 @@ class Command(BaseCommand):
 
         # Compose and send the email
         translation.activate(user.userprofile.notification_language.short_name)
-        context = {}
-        context['site'] = Site.objects.get_current()
-        context['workout'] = workout
-        context['expired'] = True if delta.days < 0 else False
-        context['days'] = abs(delta.days)
+        context = {'site': Site.objects.get_current(),
+                   'workout': workout,
+                   'expired': True if delta.days < 0 else False,
+                   'days': abs(delta.days)}
 
         subject = _('Workout will expire soon')
         message = loader.render_to_string('workout/email_reminder.tpl', context)

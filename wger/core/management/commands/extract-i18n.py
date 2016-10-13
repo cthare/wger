@@ -16,6 +16,7 @@
 
 from django.core.management.base import BaseCommand
 
+from wger.core.models import RepetitionUnit
 from wger.exercises.models import (
     ExerciseCategory,
     Muscle,
@@ -30,19 +31,16 @@ class Command(BaseCommand):
 
     help = 'Read out all strings that have to be included manually in the .po file'
 
-    def handle(self, *args, **options):
+    def handle(self, **options):
 
-        # Exercise categories
-        for category in ExerciseCategory.objects.all():
-            self.stdout.write('msgid "{0}"\n'
-                              'msgstr ""\n\n'.format(category))
+        # Collect all translatable items
+        out = []
+        out += [i for i in ExerciseCategory.objects.all()]
+        out += [i for i in Equipment.objects.all()]
+        out += [i for i in Muscle.objects.all()]
+        out += [i for i in RepetitionUnit.objects.all()]
 
-        # Equipment names
-        for equipment in Equipment.objects.all():
+        # Print the result
+        for i in out:
             self.stdout.write('msgid "{0}"\n'
-                              'msgstr ""\n\n'.format(equipment))
-
-        # Muscles
-        for muscle in Muscle.objects.all():
-            self.stdout.write('msgid "{0}"\n'
-                              'msgstr ""\n\n'.format(muscle))
+                              'msgstr ""\n\n'.format(i))

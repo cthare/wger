@@ -196,13 +196,6 @@
 
 
 {% block sidebar %}
-{% if perms.gym.gym_trainer %}
-<a href="{% url 'core:user:trainer-login' current_user.pk %}" class="btn btn-success btn-sm">{% trans "Log in as this user" %}</a>
-<div class="clear-fix" style="margin-bottom: 1em;"></div>
-{% endif %}
-
-
-
 {% if perms.gym.manage_gyms or perms.gym.manage_gym %}
 <div class="btn-group pull-right">
     <button type="button" class="btn btn-default dropdown-toggle btn-xs" data-toggle="dropdown">
@@ -224,9 +217,11 @@
             <a data-url="{% url 'gym:gym:reset-user-password' current_user.pk %}" data-toggle="modal" data-target="#confirmation-modal">{% trans "Reset user password" %}</a>
         </li>
         {% if perms.gym.manage_gym or perms.gym.manage_gyms %}
+        {% if current_user.userprofile.gym %}
         <li>
             <a href="{% url 'gym:gym:edit-user-permission' current_user.pk %}" class="wger-modal-dialog">{% trans "Roles"%}</a>
         </li>
+        {% endif %}
         {% endif %}
         <li>
             <a href="{% url 'core:user:delete' current_user.pk %}" class="wger-modal-dialog">{% trans "Delete"%}</a>
@@ -484,11 +479,21 @@
         <td>{% trans 'Include in inactive overview' %}</td>
         <td style="text-align: right;">
             {% if current_user.gymuserconfig.include_inactive %}
-                <span class="glyphicon glyphicon-ok"></span>
+                <span class="{% fa_class 'check' %}"></span>
             {% else %}
-                <span class="glyphicon glyphicon-remove"></span>
+                <span class="{% fa_class 'times' %}"></span>
             {% endif %}
         </td>
     </tr>
 </table>
+{% endblock %}
+
+
+{#         #}
+{# Options #}
+{#         #}
+{% block options %}
+{% if perms.gym.gym_trainer %}
+    <a href="{% url 'core:user:trainer-login' current_user.pk %}" class="btn btn-success btn-sm">{% trans "Log in as this user" %}</a>
+{% endif %}
 {% endblock %}

@@ -27,8 +27,30 @@ from django.core.urlresolvers import reverse_lazy
 from wger.core.views import (
     user,
     misc,
-    license
+    license,
+    languages,
+    repetition_units,
+    weight_units
 )
+
+# sub patterns for languages
+patterns_language = [
+   url(r'^list$',
+        languages.LanguageListView.as_view(),
+        name='overview'),
+   url(r'^(?P<pk>\d+)/view$',
+        languages.LanguageDetailView.as_view(),
+        name='view'),
+   url(r'^(?P<pk>\d+)/delete$',
+        languages.LanguageDeleteView.as_view(),
+        name='delete'),
+   url(r'^(?P<pk>\d+)/edit',
+        languages.LanguageEditView.as_view(),
+        name='edit'),
+   url(r'^add$',
+        languages.LanguageCreateView.as_view(),
+        name='add'),
+]
 
 # sub patterns for user
 patterns_user = [
@@ -120,6 +142,38 @@ patterns_license = [
         name='delete'),
 ]
 
+# sub patterns for setting units
+patterns_repetition_units = [
+    url(r'^list$',
+        repetition_units.ListView.as_view(),
+        name='list'),
+    url(r'^add$',
+        repetition_units.AddView.as_view(),
+        name='add'),
+    url(r'^(?P<pk>\d+)/edit',
+        repetition_units.UpdateView.as_view(),
+        name='edit'),
+    url(r'^(?P<pk>\d+)/delete',
+        repetition_units.DeleteView.as_view(),
+        name='delete'),
+]
+
+# sub patterns for setting units
+patterns_weight_units = [
+    url(r'^list$',
+        weight_units.ListView.as_view(),
+        name='list'),
+    url(r'^add$',
+        weight_units.AddView.as_view(),
+        name='add'),
+    url(r'^(?P<pk>\d+)/edit',
+        weight_units.UpdateView.as_view(),
+        name='edit'),
+    url(r'^(?P<pk>\d+)/delete',
+        weight_units.DeleteView.as_view(),
+        name='delete'),
+]
+
 
 #
 # Actual patterns
@@ -147,6 +201,9 @@ urlpatterns = [
         misc.FeedbackClass.as_view(),
         name='feedback'),
 
+    url(r'^language/', include(patterns_language, namespace="language")),
     url(r'^user/', include(patterns_user, namespace="user")),
     url(r'^license/', include(patterns_license, namespace="license")),
+    url(r'^repetition-unit/', include(patterns_repetition_units, namespace="repetition-unit")),
+    url(r'^weight-unit/', include(patterns_weight_units, namespace="weight-unit")),
 ]

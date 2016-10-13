@@ -1,8 +1,7 @@
 [
     {
-        "model": "auth.group",
-        "pk": 1,
         "fields": {
+            "name": "admin",
             "permissions": [
                 [
                     "add_gymconfig",
@@ -63,6 +62,36 @@
                     "delete_license",
                     "core",
                     "license"
+                ],
+                [
+                    "add_repetitionunit",
+                    "core",
+                    "repetitionunit"
+                ],
+                [
+                    "change_repetitionunit",
+                    "core",
+                    "repetitionunit"
+                ],
+                [
+                    "delete_repetitionunit",
+                    "core",
+                    "repetitionunit"
+                ],
+                [
+                    "add_weightunit",
+                    "core",
+                    "weightunit"
+                ],
+                [
+                    "change_weightunit",
+                    "core",
+                    "weightunit"
+                ],
+                [
+                    "delete_weightunit",
+                    "core",
+                    "weightunit"
                 ],
                 [
                     "add_equipment",
@@ -244,14 +273,14 @@
                     "nutrition",
                     "weightunit"
                 ]
-            ],
-            "name": "admin"
-        }
+            ]
+        },
+        "model": "auth.group",
+        "pk": 1
     },
     {
-        "model": "auth.group",
-        "pk": 2,
         "fields": {
+            "name": "general_gym_manager",
             "permissions": [
                 [
                     "change_gymconfig",
@@ -283,14 +312,14 @@
                     "gym",
                     "gymadminconfig"
                 ]
-            ],
-            "name": "general_gym_manager"
-        }
+            ]
+        },
+        "model": "auth.group",
+        "pk": 2
     },
     {
-        "model": "auth.group",
-        "pk": 3,
         "fields": {
+            "name": "gym_manager",
             "permissions": [
                 [
                     "add_log",
@@ -318,21 +347,6 @@
                     "contract"
                 ],
                 [
-                    "add_contracttype",
-                    "gym",
-                    "contracttype"
-                ],
-                [
-                    "change_contracttype",
-                    "gym",
-                    "contracttype"
-                ],
-                [
-                    "delete_contracttype",
-                    "gym",
-                    "contracttype"
-                ],
-                [
                     "add_contractoption",
                     "gym",
                     "contractoption"
@@ -346,6 +360,21 @@
                     "delete_contractoption",
                     "gym",
                     "contractoption"
+                ],
+                [
+                    "add_contracttype",
+                    "gym",
+                    "contracttype"
+                ],
+                [
+                    "change_contracttype",
+                    "gym",
+                    "contracttype"
+                ],
+                [
+                    "delete_contracttype",
+                    "gym",
+                    "contracttype"
                 ],
                 [
                     "change_gym",
@@ -367,14 +396,14 @@
                     "gym",
                     "gymconfig"
                 ]
-            ],
-            "name": "gym_manager"
-        }
+            ]
+        },
+        "model": "auth.group",
+        "pk": 3
     },
     {
-        "model": "auth.group",
-        "pk": 4,
         "fields": {
+            "name": "gym_trainer",
             "permissions": [
                 [
                     "add_adminusernote",
@@ -421,16 +450,116 @@
                     "gym",
                     "userdocument"
                 ]
-            ],
-            "name": "gym_trainer"
-        }
+            ]
+        },
+        "model": "auth.group",
+        "pk": 4
     },
     {
-        "model": "auth.group",
-        "pk": 5,
         "fields": {
-            "permissions": [],
-            "name": "gym_member"
-        }
+            "name": "gym_member",
+            "permissions": []
+        },
+        "model": "auth.group",
+        "pk": 5
+    },
+    {
+        "fields": {
+            "name": "exercises_editor",
+            "permissions": [
+                [
+                    "add_equipment",
+                    "exercises",
+                    "equipment"
+                ],
+                [
+                    "change_equipment",
+                    "exercises",
+                    "equipment"
+                ],
+                [
+                    "delete_equipment",
+                    "exercises",
+                    "equipment"
+                ],
+                [
+                    "add_exercise",
+                    "exercises",
+                    "exercise"
+                ],
+                [
+                    "change_exercise",
+                    "exercises",
+                    "exercise"
+                ],
+                [
+                    "delete_exercise",
+                    "exercises",
+                    "exercise"
+                ],
+                [
+                    "add_exercisecategory",
+                    "exercises",
+                    "exercisecategory"
+                ],
+                [
+                    "change_exercisecategory",
+                    "exercises",
+                    "exercisecategory"
+                ],
+                [
+                    "delete_exercisecategory",
+                    "exercises",
+                    "exercisecategory"
+                ],
+                [
+                    "add_exercisecomment",
+                    "exercises",
+                    "exercisecomment"
+                ],
+                [
+                    "change_exercisecomment",
+                    "exercises",
+                    "exercisecomment"
+                ],
+                [
+                    "delete_exercisecomment",
+                    "exercises",
+                    "exercisecomment"
+                ],
+                [
+                    "add_exerciseimage",
+                    "exercises",
+                    "exerciseimage"
+                ],
+                [
+                    "change_exerciseimage",
+                    "exercises",
+                    "exerciseimage"
+                ],
+                [
+                    "delete_exerciseimage",
+                    "exercises",
+                    "exerciseimage"
+                ],
+                [
+                    "add_muscle",
+                    "exercises",
+                    "muscle"
+                ],
+                [
+                    "change_muscle",
+                    "exercises",
+                    "muscle"
+                ],
+                [
+                    "delete_muscle",
+                    "exercises",
+                    "muscle"
+                ]
+            ]
+        },
+        "model": "auth.group",
+        "pk": 6
     }
 ]

@@ -12,23 +12,21 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 
-import logging
 import datetime
+import logging
 
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.urlresolvers import reverse, reverse_lazy
 
 from wger.core.tests import api_base_test
+from wger.core.tests.base_testcase import WorkoutManagerDeleteTestCase
+from wger.core.tests.base_testcase import WorkoutManagerTestCase
 from wger.exercises.models import Exercise
-from wger.manager.models import WorkoutLog
 from wger.manager.models import Workout
+from wger.manager.models import WorkoutLog
 from wger.manager.models import WorkoutSession
-from wger.manager.tests.testcase import WorkoutManagerTestCase
-from wger.manager.tests.testcase import WorkoutManagerAddTestCase
-from wger.manager.tests.testcase import WorkoutManagerDeleteTestCase
-from wger.utils.cache import get_template_cache_name, cache_mapper
-
+from wger.utils.cache import cache_mapper
 
 logger = logging.getLogger(__name__)
 
@@ -191,12 +189,17 @@ class WeightLogOverviewAddTestCase(WorkoutManagerTestCase):
                                      'time_start': datetime.time(10, 0),
                                      'time_end': datetime.time(12, 0),
                                      'form-0-reps': 10,
+                                     'form-0-repetition_unit': 1,
                                      'form-0-weight': 10,
+                                     'form-0-weight_unit': 1,
+                                     'form-1-reps': 10,
+                                     'form-1-repetition_unit': 1,
+                                     'form-1-weight': 10,
+                                     'form-1-weight_unit': 1,
                                      'form-TOTAL_FORMS': 3,
                                      'form-INITIAL_FORMS': 0,
                                      'form-MAX-NUM_FORMS': 3
                                      })
-
         count_after = WorkoutLog.objects.count()
 
         # Logged out users get a 302 redirect to login page
@@ -239,7 +242,7 @@ class WeightlogTestCase(WorkoutManagerTestCase):
 
     def test_get_workout_session(self):
         '''
-        Test the get_workout_session method
+        Test the wgerGetWorkoutSession method
         '''
 
         user1 = User.objects.get(pk=1)
@@ -284,19 +287,6 @@ class WeightlogTestCase(WorkoutManagerTestCase):
         self.assertEqual(l.get_workout_session(), session1)
 
 
-class WeightLogAddTestCase(WorkoutManagerAddTestCase):
-    '''
-    Tests adding a WorkoutLog
-    '''
-
-    object_class = WorkoutLog
-    url = reverse_lazy('manager:log:add', kwargs={'workout_pk': 1})
-    data = {'reps': 10,
-            'weight': 120.5,
-            'date': datetime.date.today(),
-            'exercise': 1}
-
-
 class WeightLogDeleteTestCase(WorkoutManagerDeleteTestCase):
     '''
     Tests deleting a WorkoutLog
@@ -328,6 +318,8 @@ class WeightLogEntryEditTestCase(WorkoutManagerTestCase):
         response = self.client.post(reverse('manager:log:edit', kwargs={'pk': 1}),
                                     {'date': '2012-01-01',
                                      'reps': 10,
+                                     'repetition_unit': 2,
+                                     'weight_unit': 3,
                                      'weight': 10,
                                      'exercise': 1
                                      })
@@ -514,5 +506,7 @@ class WorkoutLogApiTestCase(api_base_test.ApiBaseResourceTestCase):
     data = {"exercise": 1,
             "workout": 3,
             "reps": 3,
+            "repetition_unit": 1,
+            "weight_unit": 2,
             "weight": 2,
             "date": datetime.date.today()}

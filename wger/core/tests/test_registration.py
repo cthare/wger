@@ -14,12 +14,12 @@
 
 import logging
 
-from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
+
 from wger.core.forms import RegistrationForm
 from wger.core.forms import RegistrationFormNoCaptcha
-
-from wger.manager.tests.testcase import WorkoutManagerTestCase
+from wger.core.tests.base_testcase import WorkoutManagerTestCase
 
 logger = logging.getLogger(__name__)
 
@@ -36,13 +36,17 @@ class RegistrationTestCase(WorkoutManagerTestCase):
         '''
         with self.settings(WGER_SETTINGS={'USE_RECAPTCHA': True,
                                           'REMOVE_WHITESPACE': False,
-                                          'ALLOW_REGISTRATION': True}):
+                                          'ALLOW_REGISTRATION': True,
+                                          'ALLOW_GUEST_USERS': True,
+                                          'TWITTER': False}):
             response = self.client.get(reverse('core:user:registration'))
             self.assertIsInstance(response.context['form'], RegistrationForm)
 
         with self.settings(WGER_SETTINGS={'USE_RECAPTCHA': False,
                                           'REMOVE_WHITESPACE': False,
-                                          'ALLOW_REGISTRATION': True}):
+                                          'ALLOW_REGISTRATION': True,
+                                          'ALLOW_GUEST_USERS': True,
+                                          'TWITTER': False}):
             response = self.client.get(reverse('core:user:registration'))
             self.assertIsInstance(response.context['form'], RegistrationFormNoCaptcha)
 
@@ -95,6 +99,7 @@ class RegistrationTestCase(WorkoutManagerTestCase):
 
         with self.settings(WGER_SETTINGS={'USE_RECAPTCHA': False,
                                           'REMOVE_WHITESPACE': False,
+                                          'ALLOW_GUEST_USERS': True,
                                           'ALLOW_REGISTRATION': False}):
 
             # Fetch the registration page

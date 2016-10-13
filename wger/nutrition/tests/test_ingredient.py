@@ -13,25 +13,24 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Workout Manager.  If not, see <http://www.gnu.org/licenses/>.
 
-import json
 import datetime
+import json
+from decimal import Decimal
 
-from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
-from wger.core.tests import api_base_test
+from django.core.urlresolvers import reverse
+
 from wger.core.models import Language
-
-from wger.nutrition.models import Ingredient
-from wger.nutrition.models import Meal
-
-from wger.utils.constants import NUTRITION_TAB
-
-from wger.manager.tests.testcase import (
+from wger.core.tests import api_base_test
+from wger.core.tests.base_testcase import (
     WorkoutManagerTestCase,
     WorkoutManagerDeleteTestCase,
     WorkoutManagerEditTestCase,
     WorkoutManagerAddTestCase
 )
+from wger.nutrition.models import Ingredient
+from wger.nutrition.models import Meal
+from wger.utils.constants import NUTRITION_TAB
 
 
 class IngredientRepresentationTestCase(WorkoutManagerTestCase):
@@ -187,15 +186,15 @@ class IngredientSearchTestCase(WorkoutManagerTestCase):
         response = self.client.get(reverse('ingredient-search'), {'term': 'test'}, **kwargs)
         self.assertEqual(response.status_code, 200)
         result = json.loads(response.content.decode('utf8'))
-        self.assertEqual(len(result), 2)
-        self.assertEqual(result[0]['value'], 'Ingredient, test, 2, organic, raw')
-        self.assertEqual(result[1]['value'], 'Test ingredient 1')
+        self.assertEqual(len(result['suggestions']), 2)
+        self.assertEqual(result['suggestions'][0]['value'], 'Ingredient, test, 2, organic, raw')
+        self.assertEqual(result['suggestions'][1]['value'], 'Test ingredient 1')
 
         # Search for an ingredient pending review (0 hits, "Pending ingredient")
         response = self.client.get(reverse('ingredient-search'), {'term': 'Pending'}, **kwargs)
         self.assertEqual(response.status_code, 200)
         result = json.loads(response.content.decode('utf8'))
-        self.assertEqual(len(result), 0)
+        self.assertEqual(len(result['suggestions']), 0)
 
     def test_search_ingredient_anonymous(self):
         '''
@@ -326,7 +325,7 @@ class IngredientTestCase(WorkoutManagerTestCase):
         ingredient.energy = 50
         ingredient.protein = 0.5
         ingredient.carbohydrates = 12
-        ingredient.fat = 0.1
+        ingredient.fat = Decimal('0.1')
         ingredient.language_id = 1
         self.assertFalse(ingredient.full_clean())
 

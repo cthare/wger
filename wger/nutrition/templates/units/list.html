@@ -12,7 +12,7 @@
     <li class="list-group-item ">
         <div class="btn-group pull-right">
             <button type="button" class="btn btn-default dropdown-toggle btn-xs" data-toggle="dropdown">
-                <span class="glyphicon glyphicon-cog"></span>
+                <span class="{% fa_class 'cog' %}"></span>
             </button>
             <ul class="dropdown-menu" role="menu">
                 <li>
@@ -39,10 +39,11 @@
 
 
 
-{% block sidebar %}
-<p>
+{#         #}
+{# Options #}
+{#         #}
+{% block options %}
     <a href="{% url 'nutrition:weight_unit:add' %}" class="btn btn-success btn-sm wger-modal-dialog">
         {% trans "Add new weight unit" %}
     </a>
-</p>
 {% endblock %}

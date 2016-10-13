@@ -15,9 +15,8 @@
 from django.core import mail
 from django.core.urlresolvers import reverse
 
+from wger.core.tests.base_testcase import WorkoutManagerTestCase
 from wger.exercises.models import Exercise
-
-from wger.manager.tests.testcase import WorkoutManagerTestCase
 
 
 class ExercisesCorrectionTestCase(WorkoutManagerTestCase):
@@ -32,7 +31,7 @@ class ExercisesCorrectionTestCase(WorkoutManagerTestCase):
         description = 'a nice, long and accurate description for the exercise'
         response = self.client.post(reverse('exercise:exercise:correct', kwargs={'pk': 1}),
                                     {'category': 3,
-                                     'name': 'my test exercise',
+                                     'name_original': 'my test exercise',
                                      'license': 2,
                                      'description': description,
                                      'muscles': [3]})

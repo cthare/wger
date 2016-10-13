@@ -23,7 +23,7 @@
     <li class="list-group-item ">
         <div class="btn-group pull-right">
             <button type="button" class="btn btn-default dropdown-toggle btn-xs" data-toggle="dropdown">
-                <span class="glyphicon glyphicon-cog"></span>
+                <span class="{% fa_class 'cog' %}"></span>
             </button>
             <ul class="dropdown-menu" role="menu">
                 <li>
@@ -69,9 +69,12 @@
 
 
 
-{% block sidebar %}
+{#         #}
+{# Options #}
+{#         #}
+{% block options %}
 {% if perms.gym.add_userdocument %}
-   <a href="{% url 'gym:document:add' member.pk %}" class="btn btn-success" %}>
+   <a href="{% url 'gym:document:add' member.pk %}" class="btn btn-sm btn-success" %}>
        {% trans "Add" %}
    </a>
 {% endif %}

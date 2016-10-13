@@ -62,12 +62,18 @@ $(document).ready(function() {
                     <ul class="list-group" style="min-height: 10em;">
                     {% for log in logs %}
                         <li class="list-group-item">
-                            {{log.reps}} × {{log.weight}}
+                            {{log.reps}}
+                            {% if not log.repetition_unit.is_repetition %}
+                                {% trans log.repetition_unit.name %}
+                            {% endif %}
+                            ×
+                            {{log.weight}} {% trans log.weight_unit.name %}
+
                             {% if is_owner %}
                             <span class="editoptions">
                                 <div class="btn-group pull-right">
                                     <button type="button" class="btn btn-default dropdown-toggle btn-xs" data-toggle="dropdown">
-                                        <span class="glyphicon glyphicon-cog"></span>
+                                        <span class="{% fa_class 'cog' %}"></span>
                                     </button>
                                     <ul class="dropdown-menu" role="menu">
                                         <li>
@@ -100,15 +106,6 @@ $(document).ready(function() {
 {# Side bar #}
 {#          #}
 {% block sidebar %}
-{% if is_owner %}
-<p>
-    <a href="#" id="calendar-day-select-link" data-toggle="modal" data-target="#ecalendar-day-select-popup" class="btn btn-success btn-sm">
-        {% trans "Add new log" %}
-    </a>
-</p>
-{% endif %}
-
-
 <div class="modal fade" id="ecalendar-day-select-popup">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -129,14 +126,14 @@ day in your current workout:{% endblocktrans %} <strong>{{current_workout}}</str
                 <p><em>{% trans "No workouts found." %}</em></p>
                 <p>
                 <a href="{% url 'manager:workout:add' %}" class="btn btn-block btn-default">
-                   <img src="{% static 'images/icons/add.svg' %}"
-                        width="22"
-                        height="22"
-                        alt="">
+                    <span class="{% fa_class 'plus' %}"></span>
                     {% trans "Add one now." %}
                 </a>
                 </p>
                 {% endif %}
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Close" %}</button>
             </div>
         </div>
     </div>
@@ -154,11 +151,8 @@ you can click on them to see the details.{% endblocktrans %}</p>
 
 <p>
     <a href="{% url 'manager:workout:calendar' owner_user %}">
-        <img src="{% static 'images/icons/calendar.svg' %}"
-             width="32"
-             height="32"
-             alt="{% trans 'Go to current month' %}">
-    {% trans "Go to current month" %}</a>
+        <span class="{% fa_class 'calendar' %}"></span>
+        {% trans "Go to current month" %}</a>
 </p>
 
 
@@ -183,4 +177,13 @@ you can click on them to see the details.{% endblocktrans %}</p>
         </div>
     {% endfor %}
     </div>
+{% endblock %}
+
+
+{% block options %}
+{% if is_owner %}
+    <a href="#" id="calendar-day-select-link" data-toggle="modal" data-target="#ecalendar-day-select-popup" class="btn btn-success btn-sm">
+        {% trans "Add new log" %}
+    </a>
+{% endif %}
 {% endblock %}

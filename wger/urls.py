@@ -18,9 +18,11 @@
 from tastypie.api import Api
 from rest_framework import routers
 
+from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.i18n import i18n_patterns
-from django.conf.urls.i18n import patterns
+from django.conf.urls.static import static
+from django.contrib.sitemaps.views import sitemap
 
 from wger.nutrition.sitemap import NutritionSitemap
 from wger.exercises.sitemap import ExercisesSitemap
@@ -96,6 +98,8 @@ router.register(r'userprofile', core_api_views.UserProfileViewSet, base_name='us
 router.register(r'language', core_api_views.LanguageViewSet, base_name='language')
 router.register(r'daysofweek', core_api_views.DaysOfWeekViewSet, base_name='daysofweek')
 router.register(r'license', core_api_views.LicenseViewSet, base_name='license')
+router.register(r'setting-repetitionunit', core_api_views.RepetitionUnitViewSet, base_name='setting-repetition-unit')
+router.register(r'setting-weightunit', core_api_views.WeightUnitViewSet, base_name='setting-weight-unit')
 
 # Exercises app
 router.register(r'exercise', exercises_api_views.ExerciseViewSet, base_name='exercise')
@@ -140,9 +144,8 @@ urlpatterns = i18n_patterns(
     url(r'config/', include('wger.config.urls', namespace='config', app_name='config')),
     url(r'gym/', include('wger.gym.urls', namespace='gym', app_name='gym')),
     url(r'email/', include('wger.email.urls', namespace='email')),
-    url(r'^browserid/', include('django_browserid.urls')),
     url(r'^sitemap\.xml$',
-        'django.contrib.sitemaps.views.sitemap',
+        sitemap,
         {'sitemaps': sitemaps},
         name='sitemap')
 )
@@ -150,15 +153,12 @@ urlpatterns = i18n_patterns(
 #
 # URLs without language prefix
 #
-urlpatterns = urlpatterns + [
+urlpatterns += [
     url(r'^robots\.txt$',
         TextTemplateView.as_view(template_name="robots.txt"),
         name='robots'),
     url(r'^manifest\.webapp$', WebappManifestView.as_view(template_name="manifest.webapp")),
     url(r'^amazon-manifest\.webapp$', WebappManifestView.as_view(template_name="amazon-manifest.webapp")),
-
-    # persona (browserID) login
-    url(r'^browserid/', include('django_browserid.urls')),
 
     # API
     url(r'^api/', include(v1_api.urls)),
@@ -170,3 +170,9 @@ urlpatterns = urlpatterns + [
         name='ingredient-search'),
     url(r'^api/v2/', include(router.urls)),
 ]
+
+#
+# URL for user uploaded files, served like this during development only
+#
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

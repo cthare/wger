@@ -27,6 +27,7 @@ from django.core.urlresolvers import reverse
 from django.core import mail
 from django.core.cache import cache
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from django.utils import translation
@@ -353,7 +354,9 @@ class Ingredient(AbstractLicenseModel, models.Model):
 
         energy_fat = 0
         if self.fat:
-            energy_fat = self.fat * ENERGY_FACTOR['fat']['kg']
+            # TODO: for some reason, during the tests the fat value is not
+            #       converted to decimal (django 1.9)
+            energy_fat = Decimal(self.fat * ENERGY_FACTOR['fat']['kg'])
 
         energy_calculated = energy_protein + energy_carbohydrates + energy_fat
 
@@ -425,9 +428,10 @@ class Ingredient(AbstractLicenseModel, models.Model):
             subject = _('Ingredient was successfully added to the general database')
             context = {
                 'ingredient': self.name,
-                'url': url
+                'url': url,
+                'site': Site.objects.get_current().domain
             }
-            message = render_to_string('ingredient/email_new.html', context)
+            message = render_to_string('ingredient/email_new.tpl', context)
             mail.send_mail(subject,
                            message,
                            settings.WGER_SETTINGS['EMAIL_FROM'],

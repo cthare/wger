@@ -24,7 +24,7 @@ from django.http import (
     HttpResponseForbidden,
     HttpResponseRedirect
 )
-from django.core.context_processors import csrf
+from django.template.context_processors import csrf
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext_lazy, ugettext as _
@@ -90,6 +90,7 @@ class PlanDeleteView(WgerDeleteMixin, DeleteView):
     '''
 
     model = NutritionPlan
+    fields = ('description', 'has_goal_calories')
     success_url = reverse_lazy('nutrition:plan:overview')
     form_action_urlname = 'nutrition:plan:delete'
     messages = ugettext_lazy('Successfully deleted')
@@ -109,7 +110,7 @@ class PlanEditView(WgerFormMixin, UpdateView):
     '''
 
     model = NutritionPlan
-    fields = '__all__'
+    fields = ('description', 'has_goal_calories')
     form_action_urlname = 'nutrition:plan:edit'
 
     def get_context_data(self, **kwargs):

@@ -18,10 +18,11 @@ import logging
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponseForbidden
-from django.core.context_processors import csrf
+from django.template.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _, ugettext_lazy
 from django.utils import translation
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as django_login
 from django.contrib.auth import logout as django_logout
@@ -39,7 +40,7 @@ from django.conf import settings
 from rest_framework.authtoken.models import Token
 
 from wger.utils.constants import USER_TAB
-from wger.utils.generic_views import WgerPermissionMixin, WgerFormMixin
+from wger.utils.generic_views import WgerFormMixin, WgerMultiplePermissionRequiredMixin
 from wger.utils.user_agents import check_request_amazon, check_request_android
 from wger.core.forms import (
     UserPreferencesForm,
@@ -71,8 +72,7 @@ def login(request):
     Small wrapper around the django login view
     '''
 
-    context = {'hide_persona': check_request_amazon(request) or check_request_android(request),
-               'active_tab': USER_TAB}
+    context = {'active_tab': USER_TAB}
     if request.GET.get('next'):
         context['next'] = request.GET.get('next')
 
@@ -307,7 +307,9 @@ def preferences(request):
         return render(request, 'user/preferences.html', template_data)
 
 
-class UserDeactivateView(WgerPermissionMixin, RedirectView):
+class UserDeactivateView(LoginRequiredMixin,
+                         WgerMultiplePermissionRequiredMixin,
+                         RedirectView):
     '''
     Deactivates a user
     '''
@@ -338,7 +340,9 @@ class UserDeactivateView(WgerPermissionMixin, RedirectView):
         return reverse('core:user:overview', kwargs=({'pk': pk}))
 
 
-class UserActivateView(WgerPermissionMixin, RedirectView):
+class UserActivateView(LoginRequiredMixin,
+                       WgerMultiplePermissionRequiredMixin,
+                       RedirectView):
     '''
     Activates a previously deactivated user
     '''
@@ -369,7 +373,10 @@ class UserActivateView(WgerPermissionMixin, RedirectView):
         return reverse('core:user:overview', kwargs=({'pk': pk}))
 
 
-class UserEditView(WgerFormMixin, UpdateView):
+class UserEditView(WgerFormMixin,
+                   LoginRequiredMixin,
+                   WgerMultiplePermissionRequiredMixin,
+                   UpdateView):
     '''
     View to update the personal information of an user by an admin
     '''
@@ -437,7 +444,7 @@ def api_key(request):
     return render(request, 'user/api_key.html', context)
 
 
-class UserDetailView(WgerPermissionMixin, DetailView):
+class UserDetailView(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, DetailView):
     '''
     User overview for gyms
     '''
@@ -488,7 +495,7 @@ class UserDetailView(WgerPermissionMixin, DetailView):
         return context
 
 
-class UserListView(WgerPermissionMixin, ListView):
+class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     '''
     Overview of all users in the instance
     '''

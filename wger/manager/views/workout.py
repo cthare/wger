@@ -20,12 +20,17 @@ import datetime
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponseForbidden
-from django.core.context_processors import csrf
+from django.template.context_processors import csrf
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.utils.translation import ugettext_lazy, ugettext as _
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.views.generic import DeleteView, UpdateView
 
+from wger.core.models import (
+    RepetitionUnit,
+    WeightUnit
+)
 from wger.manager.models import (
     Workout,
     WorkoutSession,
@@ -40,8 +45,7 @@ from wger.manager.forms import (
 )
 from wger.utils.generic_views import (
     WgerFormMixin,
-    WgerDeleteMixin,
-    WgerPermissionMixin
+    WgerDeleteMixin
 )
 from wger.utils.helpers import make_token
 
@@ -60,9 +64,9 @@ def overview(request):
 
     template_data = {}
 
-    latest_workouts = Workout.objects.filter(user=request.user)
+    workouts = Workout.objects.filter(user=request.user)
     (current_workout, schedule) = Schedule.objects.get_current_workout(request.user)
-    template_data['workouts'] = latest_workouts
+    template_data['workouts'] = workouts
     template_data['current_workout'] = current_workout
 
     return render(request, 'workout/overview.html', template_data)
@@ -92,6 +96,13 @@ def view(request, pk):
     for i in canonical['muscles']['back']:
         if i not in muscles_back:
             muscles_back.append('images/muscles/main/muscle-{0}.svg'.format(i))
+
+    for i in canonical['muscles']['frontsecondary']:
+        if i not in muscles_front and i not in canonical['muscles']['front']:
+            muscles_front.append('images/muscles/secondary/muscle-{0}.svg'.format(i))
+    for i in canonical['muscles']['backsecondary']:
+        if i not in muscles_back and i not in canonical['muscles']['back']:
+            muscles_back.append('images/muscles/secondary/muscle-{0}.svg'.format(i))
 
     # Append the silhouette of the human body as the last entry so the browser
     # renders it in the background
@@ -204,15 +215,15 @@ def add(request):
     return HttpResponseRedirect(workout.get_absolute_url())
 
 
-class WorkoutDeleteView(WgerDeleteMixin, DeleteView):
+class WorkoutDeleteView(WgerDeleteMixin, LoginRequiredMixin, DeleteView):
     '''
     Generic view to delete a workout routine
     '''
 
     model = Workout
+    fields = ('comment',)
     success_url = reverse_lazy('manager:workout:overview')
     messages = ugettext_lazy('Successfully deleted')
-    login_required = True
 
     def get_context_data(self, **kwargs):
         context = super(WorkoutDeleteView, self).get_context_data(**kwargs)
@@ -222,7 +233,7 @@ class WorkoutDeleteView(WgerDeleteMixin, DeleteView):
         return context
 
 
-class WorkoutEditView(WgerFormMixin, UpdateView, WgerPermissionMixin):
+class WorkoutEditView(WgerFormMixin, LoginRequiredMixin, UpdateView):
     '''
     Generic view to update an existing workout routine
     '''
@@ -230,7 +241,6 @@ class WorkoutEditView(WgerFormMixin, UpdateView, WgerPermissionMixin):
     model = Workout
     form_class = WorkoutForm
     form_action_urlname = 'manager:workout:edit'
-    login_required = True
 
     def get_context_data(self, **kwargs):
         context = super(WorkoutEditView, self).get_context_data(**kwargs)
@@ -239,7 +249,7 @@ class WorkoutEditView(WgerFormMixin, UpdateView, WgerPermissionMixin):
         return context
 
 
-class LastWeightHelper():
+class LastWeightHelper:
     '''
     Small helper class to retrieve the last workout log for a certain
     user, exercise and repetition combination.
@@ -291,6 +301,8 @@ def timer(request, day_pk):
                 exercise = exercise_dict['obj']
                 for key, element in enumerate(exercise_dict['reps_list']):
                     reps = exercise_dict['reps_list'][key]
+                    rep_unit = exercise_dict['repetition_units'][key]
+                    weight_unit = exercise_dict['weight_units'][key]
                     default_weight = last_log.get_last_weight(exercise,
                                                               reps,
                                                               exercise_dict['weight_list'][key])
@@ -301,7 +313,9 @@ def timer(request, day_pk):
                                       'exercise': exercise,
                                       'type': 'exercise',
                                       'reps': reps,
-                                      'weight': default_weight})
+                                      'rep_unit': rep_unit,
+                                      'weight': default_weight,
+                                      'weight_unit': weight_unit})
                     if request.user.userprofile.timer_active:
                         step_list.append({'current_step': uuid.uuid4().hex,
                                           'step_percent': 0,
@@ -315,6 +329,8 @@ def timer(request, day_pk):
             for i in range(0, total_reps):
                 for exercise_dict in set_dict['exercise_list']:
                     reps = exercise_dict['reps_list'][i]
+                    rep_unit = exercise_dict['repetition_units'][i]
+                    weight_unit = exercise_dict['weight_units'][i]
                     default_weight = exercise_dict['weight_list'][i]
                     exercise = exercise_dict['obj']
 
@@ -324,6 +340,8 @@ def timer(request, day_pk):
                                       'exercise': exercise,
                                       'type': 'exercise',
                                       'reps': reps,
+                                      'rep_unit': rep_unit,
+                                      'weight_unit': weight_unit,
                                       'weight': last_log.get_last_weight(exercise,
                                                                          reps,
                                                                          default_weight)})
@@ -367,4 +385,6 @@ def timer(request, day_pk):
     context['workout'] = day.training
     context['session_form'] = session_form
     context['form_action'] = url
+    context['weight_units'] = WeightUnit.objects.all()
+    context['repetition_units'] = RepetitionUnit.objects.all()
     return render(request, 'workout/timer.html', context)
